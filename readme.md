@@ -1,11 +1,22 @@
 # Discord Bot Setup Guide
 
+This bot can be used with a variety of LLMs, currently factored for Google Gemini Embedding RAG functionality, and Grok 4 through xAI API for Response Generation. 
+
 ## Prerequisites
 - Python 3.8 or higher
 - pip (Python package manager)
 - A Discord account with administrative permissions on your server
+- Ability to call API (Internet Access)
 
-## Step 1: Create a Discord Application and Bot
+## Step 1: Obtain OpenAI API Token, xAI Token, and Google OAuth2/AI Studio Token
+
+This can be done through the respective websites.
+https://openai.com/api/
+https://x.ai/api
+Guide for OAuth2: https://developers.google.com/identity/protocols/oauth2
+https://aistudio.google.com/
+
+## Step 2: Create a Discord Application and Bot
 
 1. Go to the [Discord Developer Portal](https://discord.com/developers/applications)
 2. Click "New Application" and give it a name
@@ -20,7 +31,7 @@
    - Bot Permissions: `Send Messages`, `Embed Links`, `Attach Files`, `Read Message History`, `Use External Emojis`
 7. Copy the generated URL and open it in your browser to invite the bot to your server
 
-## Step 2: Set Up the Environment
+## Step 3: Set Up the Environment
 
 1. Create a new directory for your bot
 2. Create a virtual environment:
@@ -32,10 +43,14 @@
    ```bash
    pip install discord.py requests matplotlib python-dotenv
    ```
-4. Create a `.env` file with the following content:
+4. Create a `credentials.json` file through going to Google Cloud Console, and creating new OAuth Client ID, then downloading JSON and saving as `credentials.json`
+    
+6. Create a `.env` file with the following content:
    ```
    DISCORD_TOKEN=your_bot_token_here
-   DASHBOARD_URL=http://your_server_ip:5000
+   GEMINI_API_KEY=your_api_token_here
+   GROK_API_KEY=your_api_token_here
+   DEEPSEEK_API_KEY=your_api_token_here #Optional
    PNW_API_KEY=your_pnw_api_key_here
    ```
 
@@ -45,10 +60,4 @@
 2. Start the bot:
    ```bash
    python yourbot.py
-   ```
-
-## Step 4: Integration with Web Dashboard
-
-1. Make sure your Flask dashboard is running and accessible
-2. The bot communicates with the dashboard through HTTP requests, so ensure the dashboard is reachable from where the bot is running
-3. Update the `DASHBOARD_URL` in your `.env` file to match your dashboard's actual URL
+   ``
