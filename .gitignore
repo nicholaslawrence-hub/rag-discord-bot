@@ -1,0 +1,6 @@
+config.env
+credentials.json
+bot_logs.db
+pnw_guides.db
+*.db
+__pycache__/
