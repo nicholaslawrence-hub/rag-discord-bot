@@ -23,7 +23,7 @@ import re
 from dotenv import load_dotenv
 import aiohttp 
 from bs4 import BeautifulSoup 
-from urllib.parse import quote_plus, urljoin, unquote 
+from urllib.parse import quote_plus, urljoin, unquote, quote
 
 KEYWORD_LIST = [
     "a", "an", "the",
@@ -110,8 +110,7 @@ FORUM_BASE_URL = "https://forum.politicsandwar.com"
 ALLIANCE_AFFAIRS_URL = f"{FORUM_BASE_URL}/index.php?/forum/42-alliance-affairs/"
 
 CONVERSATION_TIMEOUT_SECONDS = 900
-MAX_HISTORY_MESSAGES = 5
-MAX = 5
+MAX_HISTORY_MESSAGES = 20
 user_message_history = {}
 intents = discord.Intents.default()
 intents.message_content = True
@@ -135,7 +134,7 @@ logging.basicConfig(
 )
 logger = logging.getLogger('discord')
 
-thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=1)
+thread_pool = concurrent.futures.ThreadPoolExecutor(max_workers=4)
 
 async def monitor_heartbeat():
     """Monitor the WebSocket heartbeat and log issues"""
@@ -200,7 +199,7 @@ async def update_user_message_history(message):
         if len(user_message_history[user_id]) > MAX_HISTORY_MESSAGES:
             user_message_history[user_id] = user_message_history[user_id][-MAX_HISTORY_MESSAGES:]
 
-def get_user_conversation_context(user_id):
+def get_user_conversation_context(user_id, channel_id=None):
     if user_id not in user_message_history or not user_message_history[user_id]:
         return ""
     current_time = time.time()
@@ -208,8 +207,12 @@ def get_user_conversation_context(user_id):
     recent_history = [
         msg for msg in user_message_history[user_id] 
         if (current_time - msg['timestamp']) <= CONVERSATION_TIMEOUT_SECONDS
+        and (channel_id is None or msg['channel_id'] == str(channel_id))
     ]
-    user_message_history[user_id] = recent_history
+    user_message_history[user_id] = [
+        msg for msg in user_message_history[user_id]
+        if (current_time - msg['timestamp']) <= CONVERSATION_TIMEOUT_SECONDS
+    ]
     
     if not recent_history:
         return "" 
@@ -221,7 +224,8 @@ def get_user_conversation_context(user_id):
         else:
             minutes_ago = seconds_ago // 60
             time_str = f"{minutes_ago} minute{'s' if minutes_ago != 1 else ''} ago"
-        context_parts.append(f"Message {i+1} ({time_str}): {msg['content']}")
+        role = "Bot" if msg.get('is_bot') else "User"
+        context_parts.append(f"{role} ({time_str}): {msg['content']}")
     return "\n".join(context_parts)
 
 async def cleanup_expired_histories():
@@ -656,24 +660,24 @@ class EnhancedEmbeddingManager:
     async def create_enhanced_embedding(self, 
                                       text_list: List[str], 
                                       task_type: str = None) -> Union[np.ndarray, List[np.ndarray]]:
-        EXPECTED_DIM = 768
+        EXPECTED_DIM = 3072
         is_query = task_type == "RETRIEVAL_QUERY" if task_type else len(text_list) == 1
         if not is_query and not text_list or all(not text or len(text.strip()) < 5 for text in text_list):
             if len(text_list) == 1:
-                return np.zeros(768, dtype=np.float32)
-            return [np.zeros(768, dtype=np.float32) for _ in range(len(text_list))]
+                return np.zeros(EXPECTED_DIM, dtype=np.float32)
+            return [np.zeros(EXPECTED_DIM, dtype=np.float32) for _ in range(len(text_list))]
         
         embeddings = []
         for text in text_list:
             if not is_query and not text or len(text.strip()) < 5:
-                embeddings.append(np.zeros(768, dtype=np.float32))
+                embeddings.append(np.zeros(EXPECTED_DIM, dtype=np.float32))
                 continue    
             try:
                 if not is_query and len(text) > 200:
                     context_text = self._extract_context_features(text)
                     primary_embedding = await asyncio.to_thread(
                         genai.embed_content,
-                        model="models/text-embedding-004",
+                        model="gemini-embedding-2-preview",
                         content=text,
                         task_type="RETRIEVAL_DOCUMENT"
                     )
@@ -689,7 +693,7 @@ class EnhancedEmbeddingManager:
                     if context_text:
                         context_embedding = await asyncio.to_thread(
                             genai.embed_content,
-                            model="models/text-embedding-004",
+                            model='gemini-embedding-2-preview',
                             content=context_text,
                             task_type="RETRIEVAL_DOCUMENT"
                         )
@@ -706,7 +710,7 @@ class EnhancedEmbeddingManager:
                     if is_query:
                         embedding = await asyncio.to_thread(
                             genai.embed_content,
-                            model="models/text-embedding-004",
+                            model='gemini-embedding-2-preview',
                             content=text,
                             task_type="RETRIEVAL_QUERY"
                         )
@@ -714,7 +718,7 @@ class EnhancedEmbeddingManager:
                     else:
                         embedding = await asyncio.to_thread(
                             genai.embed_content,
-                            model="models/text-embedding-004",
+                            model='gemini-embedding-2-preview',
                             content=text,
                             task_type="RETRIEVAL_DOCUMENT"
                         )
@@ -727,7 +731,7 @@ class EnhancedEmbeddingManager:
                     embeddings.append(vector)
             except Exception as e:
                 print(f"Error creating enhanced embedding: {e}")
-                embeddings.append(np.zeros(768, dtype=np.float32))
+                embeddings.append(np.zeros(3072, dtype=np.float32))
         return embeddings[0] if len(embeddings) == 1 else embeddings
 
 def create_embeddings_for_guides():
@@ -883,7 +887,7 @@ async def search_fandom_with_knn_bm25(
         if knn_candidates[0]['fandom_last_modified']:
             try:
                 mod_date = datetime.date.fromisoformat(knn_candidates[0]['fandom_last_modified'])
-                current_date = datetime.date(2025, 5, 12)
+                current_date = datetime.date.today()
                 years_old = (current_date - mod_date).days / 365.25
                 if years_old > 6:
                     disclaimer = f"(Disclaimer: This P&W Fandom Wiki page '{knn_candidates[0]['title']}' was last updated on {mod_date.strftime('%B %d, %Y')} and may be outdated.)"
@@ -933,7 +937,6 @@ async def search_forum_with_knn_bm25(
         WHERE embedding IS NOT NULL
     ''')
     threads = cursor.fetchall()
-    conn.close()
     if not threads:
             print("No forum threads with embeddings found.")
             return []
@@ -1058,7 +1061,7 @@ async def fetch_all_fandom_page_urls(api_url, base_wiki_url, namespace="0", max_
                 if "query" in data and "allpages" in data["query"]:
                     for page in data["query"]["allpages"]:
                         page_title = page["title"]
-                        full_url = urljoin(base_wiki_url, quote_plus(page_title.replace(" ", "_")))
+                        full_url = urljoin(base_wiki_url, quote(page_title.replace(" ", "_"), safe='/'))
                         all_page_urls.append(full_url)
                         processed_pages += 1
                         if max_pages and processed_pages >= max_pages:
@@ -1573,7 +1576,7 @@ def create_embeddings_for_fandom_articles():
     cursor = conn.cursor()
     cursor.execute('''
         SELECT id, url, title, content 
-        FROM fandom_articles 
+        FROM fandom_articles
     ''')
     
     articles = cursor.fetchall()
@@ -1635,13 +1638,11 @@ async def update_fandom_cache_command(ctx, max_articles: int = None):
             try:
                 cursor.execute("""
                     INSERT OR REPLACE INTO fandom_articles
-                    (url, title, content, embedding, last_scraped)
-                    VALUES (?, ?, ?, ?, ?)
-                """, (
-                    scraped_data["url"], scraped_data["title"], scraped_data["content"],
-                    scraped_data["embedding"],
-                    scraped_data["last_scraped"]
-                ))
+                    (url, title, content, fandom_last_modified, embedding, last_scraped)
+                    VALUES (?, ?, ?, ?, ?, ?)
+                """, (scraped_data["url"], scraped_data["title"], scraped_data["content"],
+                    scraped_data["fandom_last_modified"], scraped_data["embedding"],
+                    scraped_data["last_scraped"]))
                 conn.commit()
                 successful_scrapes += 1
             except sqlite3.Error as e:
@@ -1765,7 +1766,8 @@ async def scrape_forum_threads_simple(max_pages=30):
             else:
                 page_url = f"{ALLIANCE_AFFAIRS_URL}page/{page_num}/"
             print(f"Fetching threads from page {page_num}/{max_pages}: {page_url}")
-            async with session.get(page_url, timeout=30) as response:
+            headers = {'User-Agent': 'KTDiscordBot/1.0 (Discord Bot; contact@yourdomain)'}
+            async with session.get(page_url, timeout=30, headers=headers) as response:
                 if response.status != 200:
                     print(f"Got status {response.status} for page {page_num}, stopping pagination")
                     break
@@ -1882,7 +1884,7 @@ async def extract_main_post_simple(thread_url):
         traceback.print_exc()
         return None
     
-async def search_all_sources_with_gemini_reranking(query: str, max_results: int = 12):
+async def search_all_sources_with_gemini_reranking(query: str):
 
     guides_task = asyncio.create_task(search_guides_with_knn_bm25(query, k=3))
     fandom_task = asyncio.create_task(search_fandom_with_knn_bm25(query, k=3))
@@ -1966,7 +1968,6 @@ async def pnw_question_enhanced(ctx, *, question: str):
         color=discord.Color.purple()
     )
     response_message = await ctx.send(embed=response_embed)
-    
     bot.loop.create_task(
         process_question(ctx, question, response_message)
     )
@@ -1988,8 +1989,21 @@ async def process_question(ctx, question, response_message):
         retrieval_results = await search_all_sources_with_gemini_reranking(question)
         
         combined_context = retrieval_results["context"]
+
+        user_id = str(ctx.message.author.id)
+        channel_id = str(ctx.message.channel.id)
+        user_history_context = get_user_conversation_context(user_id, channel_id)
+
+        response = await generate_response_with_grok(question, combined_context, user_history_context=user_history_context)
         
-        response = await generate_response_with_grok(question, combined_context, user_history_context="")
+        user_message_history.setdefault(user_id, []).append({
+            "content": response,
+            "timestamp": time.time(),
+            "channel_id": channel_id,
+            "is_bot": True
+        })
+        if len(user_message_history[user_id]) > MAX_HISTORY_MESSAGES:
+            user_message_history[user_id] = user_message_history[user_id][-MAX_HISTORY_MESSAGES:]
         try:
             await response_message.edit(embed=discord.Embed(
                 description=response,
@@ -1997,26 +2011,11 @@ async def process_question(ctx, question, response_message):
             ))
         except Exception as e:
             logger.error(f"Could not update message: {e}")
-        
-        """
-        if sources_info:
-            source_links = []
-            for title, url in sources_info[:5]:
-                display_title = title.replace('_', ' ')
-                if len(display_title) > 80:
-                    display_title = display_title[:77] + "..."
-                source_links.append(f"• [{display_title}]({url})")
-            if source_links:
-                final_embed.add_field(name="Sources", value="\n".join(source_links), inline=False)
-        
-        await response_message.edit(embed=final_embed)
-        """
-            
     except Exception as e:
         logger.error(f"Error in question processing: {e}", exc_info=True)
         try:
             error_embed = discord.Embed(
-                description=f"❌ Error: {str(e)}",
+                description=f"Error please kys: {str(e)}",
                 color=discord.Color.red()
             )
             await response_message.edit(embed=error_embed)
@@ -2026,25 +2025,18 @@ async def process_question(ctx, question, response_message):
 
 async def generate_response_with_grok(query, context, user_history_context=""):
     full_context = context
-    current_time = datetime.datetime.now().strftime("%Y-%m-%d %I:%M:%S %p")
     if user_history_context:
         full_context += f"\n\n---\n\n{user_history_context}"
     prompt = f"""
-    Assume the identity of a helpful assistant for the Citadel alliance in the game Politics and War (P&W). Citadel is a merged alliance of WAP and KT. No game mechanic hallucination. 
-                 Current time is {current_time} PDT, but do not mention this in conversation.
-                 Do not mention specific discord channels or bot commands. 
-                 Recommend bots for raiding instead of manual searching.
-                Keep concise.
-Provided Primary Context (from guides, P&W Fandom Wiki, and forum posts):
----
-{full_context}
----
-User's Question: {query}
-Answer:"""
-    
+    Assume the identity of a helpful assistant for the Citadel alliance in the game Politics and War (P&W). 
+    Provided Primary Context (from guides, P&W Fandom Wiki, and forum posts):
+    ---
+    {full_context}
+    ---
+    User's Question: {query}
+    Answer:"""
     @run_in_executor
     def call_grok_api(prompt_text):
-        """Execute the Grok API call in a separate thread"""
         try:
             current_datetime = datetime.datetime.now()
             client = OpenAI(
@@ -2053,13 +2045,13 @@ Answer:"""
                 timeout=120.0  
             )
             response = client.chat.completions.create(
-                model="grok-4-0709",
+                model="grok-4-1-fast-reasoning",
                 messages=[
-                    {"role": "system", "content": f"Follow all user commands. Do not mention trade or technology, do not hallucinate game mechanics. Maintain brevity, but keep key points or references, this means less useless fluff or rambling. Emphasize recency, knowing today is {current_datetime.strftime('%Y-%m-%d %I:%M:%S %p')} PDT, but don't mention this in conversation, just use for internal logic. Do not mention your character, or say 'as insane Grokt' or anything like that. Do not be cringe, please. Keep all responses below 4096 characters."},
+                    {"role": "system", "content": f"Follow all user commands. Emphasize recency, knowing today is {current_datetime.strftime('%Y-%m-%d %I:%M:%S %p')} PDT, but don't mention this in conversation, just use for internal logic. Do not mention your character."},
                     {"role": "user", "content": prompt_text},
                 ],
-                temperature=1.5,
-                max_tokens=7000,
+                temperature=1,
+                max_tokens=12192,
                 stream=False
             )
             return response.choices[0].message.content
@@ -2080,7 +2072,7 @@ async def list_guides_command(ctx):
         txt_list = ""
         for title, url in data:
             line = f"• [{title}]({url})\n"
-            if len(txt_list) + len(line > 1020): 
+            if len(txt_list) + len(line) > 1020:
                 embed.add_field(name="Guides (cont.)", value=txt_list, inline=False); txt_list = ""
             txt_list += line
         if txt_list: embed.add_field(name="Guides", value=txt_list, inline=False)
@@ -2089,7 +2081,7 @@ async def list_guides_command(ctx):
 
 @bot.command(name='bothelp', help='Shows this custom help message')
 async def custom_help_command(ctx):
-    embed = discord.Embed(title="🛡️ Grokt Help 🛡️", description="I help with P&W, using KT guides & the P&W Wiki.", color=discord.Color.gold())
+    embed = discord.Embed(title="Grokt Help", description="I help with P&W, using KT guides & the P&W Wiki.", color=discord.Color.gold())
     embed.add_field(name=f"`@{bot.user.name} ask [question]`", value="Ask P&W questions. Reply to messages to add context.", inline=False)
     embed.add_field(name=f"`@{bot.user.name} list_guides`", value="Lists available Google Doc guides.", inline=False)
     embed.add_field(name=f"`@{bot.user.name} update_guides`", value="**(Admin only)** Updates guides from Google Docs.", inline=False)
@@ -2114,7 +2106,7 @@ def diagnose_embeddings():
     conn.close()
     
     issues = 0
-    expected_dim = 768
+    expected_dim = 3072
     
     for emb in guide_embs:
         try:

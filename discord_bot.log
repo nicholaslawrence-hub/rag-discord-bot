@@ -1,0 +1,107 @@
+2026-03-10 17:53:48,180 - discord.client - INFO - logging in using static token
+2026-03-10 17:53:49,018 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: e8280f6aa96171a3fb5925737cbd6694).
+2026-03-10 17:53:51,052 - discord - INFO - WebSocket heartbeat latency: 71.98ms
+2026-03-10 18:05:00,353 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "WTF" is not found
+2026-03-10 18:05:14,323 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:09:09,564 - discord.client - INFO - logging in using static token
+2026-03-10 18:09:10,360 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 2408d53c2a8570d432b242593ec05a41).
+2026-03-10 18:09:12,383 - discord - INFO - WebSocket heartbeat latency: 70.94ms
+2026-03-10 18:09:48,608 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "hewwo" is not found
+2026-03-10 18:09:52,846 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:14:10,248 - discord.client - INFO - logging in using static token
+2026-03-10 18:14:10,939 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 56e004687bbf86e521e5b256f0d50e94).
+2026-03-10 18:14:12,973 - discord - INFO - WebSocket heartbeat latency: 72.84ms
+2026-03-10 18:14:34,454 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "who" is not found
+2026-03-10 18:14:42,607 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:15:02,175 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "wtf" is not found
+2026-03-10 18:15:08,691 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:15:20,442 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "which" is not found
+2026-03-10 18:15:43,626 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:22:45,043 - discord.client - INFO - logging in using static token
+2026-03-10 18:22:45,691 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 66a086b8de9060928dbd09aa6b65b162).
+2026-03-10 18:22:47,723 - discord - INFO - WebSocket heartbeat latency: 71.85ms
+2026-03-10 18:22:59,079 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "update_forum_cache" is not found
+2026-03-10 18:23:05,039 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:23:45,485 - discord.client - INFO - logging in using static token
+2026-03-10 18:23:46,195 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: b3909e8eaae999327632fec59581bf16).
+2026-03-10 18:23:48,219 - discord - INFO - WebSocket heartbeat latency: 75.53ms
+2026-03-10 18:25:10,282 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "dude" is not found
+2026-03-10 18:25:22,020 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:25:40,206 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "so" is not found
+2026-03-10 18:25:56,306 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 18:41:42,440 - discord.client - INFO - logging in using static token
+2026-03-10 18:41:43,223 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 5e055c4dae30b4d4683c4689f316907d).
+2026-03-10 18:41:45,234 - discord - INFO - WebSocket heartbeat latency: 76.94ms
+2026-03-10 19:17:36,983 - discord.client - INFO - logging in using static token
+2026-03-10 19:17:37,809 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 5f8072c2d5654fdaea770b52263c6512).
+2026-03-10 19:17:39,824 - discord - INFO - WebSocket heartbeat latency: 78.69ms
+2026-03-10 19:48:22,802 - discord.gateway - INFO - Shard ID None has successfully RESUMED session 5f8072c2d5654fdaea770b52263c6512.
+2026-03-10 20:07:21,923 - discord.client - INFO - logging in using static token
+2026-03-10 20:07:22,687 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 705a2bd9ceb4cbc122f421620bfddca1).
+2026-03-10 20:07:24,709 - discord - INFO - WebSocket heartbeat latency: 72.70ms
+2026-03-10 20:07:30,223 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "tell" is not found
+2026-03-10 20:07:45,301 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 20:08:22,675 - discord.client - INFO - logging in using static token
+2026-03-10 20:08:23,363 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 01e770cfae4c6e551fbd6ec59807af67).
+2026-03-10 20:08:25,383 - discord - INFO - WebSocket heartbeat latency: 74.83ms
+2026-03-10 20:09:34,759 - discord.client - INFO - logging in using static token
+2026-03-10 20:09:35,440 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: fdd2801ef0b54adac0598a6030f791e2).
+2026-03-10 20:09:37,474 - discord - INFO - WebSocket heartbeat latency: 73.23ms
+2026-03-10 20:10:07,811 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "when" is not found
+2026-03-10 20:10:23,564 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 20:10:47,600 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "what" is not found
+2026-03-10 20:10:52,350 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 20:11:10,253 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "what" is not found
+2026-03-10 20:11:14,586 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 21:09:37,485 - discord - INFO - WebSocket heartbeat latency: 75.87ms
+2026-03-10 22:09:37,485 - discord - INFO - WebSocket heartbeat latency: 77.69ms
+2026-03-10 22:28:39,406 - discord.gateway - INFO - Shard ID None has successfully RESUMED session fdd2801ef0b54adac0598a6030f791e2.
+2026-03-10 23:09:37,489 - discord - INFO - WebSocket heartbeat latency: 73.92ms
+2026-03-10 23:17:15,787 - discord.client - INFO - logging in using static token
+2026-03-10 23:17:16,419 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: de02b0b1f330519031c893a489707089).
+2026-03-10 23:17:18,436 - discord - INFO - WebSocket heartbeat latency: 75.07ms
+2026-03-10 23:17:28,769 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "kys" is not found
+2026-03-10 23:17:33,548 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:17:41,897 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "why" is not found
+2026-03-10 23:17:47,587 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:18:00,131 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "why" is not found
+2026-03-10 23:18:22,163 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:20:02,860 - discord.client - INFO - logging in using static token
+2026-03-10 23:20:03,735 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 9d5eb2cb78985fce463e61440cb8bd01).
+2026-03-10 23:20:05,755 - discord - INFO - WebSocket heartbeat latency: 71.49ms
+2026-03-10 23:20:07,161 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "why" is not found
+2026-03-10 23:20:37,140 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:21:22,729 - discord.client - INFO - logging in using static token
+2026-03-10 23:21:23,420 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: ccb7175ba5066e39e62bdcd5f22a0212).
+2026-03-10 23:21:25,433 - discord - INFO - WebSocket heartbeat latency: 75.30ms
+2026-03-10 23:21:30,538 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "pal" is not found
+2026-03-10 23:21:41,291 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:22:35,172 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "is" is not found
+2026-03-10 23:22:43,553 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:23:32,779 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "thoughts" is not found
+2026-03-10 23:23:49,166 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:24:22,659 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "why" is not found
+2026-03-10 23:24:30,603 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:25:08,757 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "fastest" is not found
+2026-03-10 23:26:14,409 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
