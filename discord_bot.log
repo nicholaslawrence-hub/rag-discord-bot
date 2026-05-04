@@ -105,3 +105,16 @@ discord.ext.commands.errors.CommandNotFound: Command "why" is not found
 2026-03-10 23:25:08,757 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
 discord.ext.commands.errors.CommandNotFound: Command "fastest" is not found
 2026-03-10 23:26:14,409 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-10 23:35:20,798 - discord.client - INFO - logging in using static token
+2026-03-10 23:35:21,747 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: 6da8e10d922a65047cbcf56e7fe3cccb).
+2026-03-10 23:35:23,766 - discord - INFO - WebSocket heartbeat latency: 76.55ms
+2026-03-10 23:35:31,122 - discord.ext.commands.bot - ERROR - Ignoring exception in command None
+discord.ext.commands.errors.CommandNotFound: Command "why" is not found
+2026-03-10 23:35:46,883 - httpx - INFO - HTTP Request: POST https://api.x.ai/v1/chat/completions "HTTP/1.1 200 OK"
+2026-03-11 00:34:29,781 - discord.gateway - INFO - Shard ID None has successfully RESUMED session 6da8e10d922a65047cbcf56e7fe3cccb.
+2026-03-11 00:35:23,779 - discord - INFO - WebSocket heartbeat latency: 70.79ms
+2026-03-11 01:29:49,017 - discord.gateway - WARNING - Shard ID None has stopped responding to the gateway. Closing and restarting.
+2026-03-11 01:29:49,223 - discord.gateway - INFO - Shard ID None session has been invalidated.
+2026-03-11 01:29:54,662 - discord.gateway - INFO - Shard ID None has connected to Gateway (Session ID: f7ca8e98aa12e4540028d0270e7c2dbb).
+2026-03-11 01:29:56,701 - discord - INFO - WebSocket heartbeat latency: 5001.29ms
+2026-03-11 01:29:56,701 - discord - WARNING - High latency detected: 5001.29ms

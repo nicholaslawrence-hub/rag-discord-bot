@@ -1622,7 +1622,7 @@ async def update_fandom_cache_command(ctx, max_articles: int = None):
         await ctx.send("No Fandom URLs fetched from the API. Aborting Fandom cache update.")
         return
     total_to_scrape = len(all_article_urls)
-    await ctx.send(f"Found {total_to_scrape} articles to process. Starting scraping and embedding... (This may take a very long time)")
+    await ctx.send(f"Found {total_to_scrape} articles to process. Starting scraping and embedding...")
 
     conn = sqlite3.connect(DB_PATH)
     cursor = conn.cursor()
