@@ -1884,18 +1884,88 @@ async def extract_main_post_simple(thread_url):
         traceback.print_exc()
         return None
     
+async def gemini_rerank_candidates(query: str, candidates: List[Dict[str, Any]], top_n: int = 6) -> List[Dict[str, Any]]:
+    """Rerank retrieved candidates by relevance to the query using a Gemini LLM.
+
+    Gemini has no dedicated rerank endpoint, so we use a generative model as a
+    relevance judge: each candidate is scored 0-10 and the list is sorted by that
+    score. On any failure we fall back to the original retrieval order so the
+    pipeline keeps working.
+    """
+    if not candidates:
+        return candidates
+    if not GEMINI_API_KEY:
+        print("Reranking skipped: GEMINI_API_KEY not set, using initial retrieval order.")
+        return candidates[:top_n]
+
+    MAX_CONTENT_CHARS = 1500
+    doc_blocks = []
+    for idx, cand in enumerate(candidates):
+        snippet = (cand.get("content") or "")[:MAX_CONTENT_CHARS]
+        doc_blocks.append(
+            f"[{idx}] (source: {cand['source_type']}) Title: {cand['title']}\n{snippet}"
+        )
+    documents_text = "\n\n".join(doc_blocks)
+
+    prompt = f"""You are a relevance ranking system for a Politics & War (P&W) knowledge base.
+Given a user query and a list of numbered candidate documents, score how well each
+document answers the query on a scale from 0 (irrelevant) to 10 (directly answers it).
+
+User query: {query}
+
+Candidate documents:
+{documents_text}
+
+Respond with ONLY a JSON array of objects, one per document, like:
+[{{"index": 0, "score": 7}}, {{"index": 1, "score": 2}}]
+Include every index exactly once. Do not add any text outside the JSON."""
+
+    @run_in_executor
+    def call_gemini_rerank(prompt_text):
+        model = genai.GenerativeModel("gemini-2.5-flash")
+        response = model.generate_content(
+            prompt_text,
+            generation_config={"temperature": 0.0, "response_mime_type": "application/json"},
+        )
+        return response.text
+
+    try:
+        raw = await call_gemini_rerank(prompt)
+        cleaned = re.sub(r"^```(?:json)?|```$", "", raw.strip(), flags=re.MULTILINE).strip()
+        scores = json.loads(cleaned)
+
+        score_by_index = {}
+        for entry in scores:
+            i = int(entry["index"])
+            if 0 <= i < len(candidates):
+                score_by_index[i] = float(entry.get("score", 0))
+
+        for idx, cand in enumerate(candidates):
+            cand["rerank_score"] = score_by_index.get(idx, cand.get("initial_score", 0.0))
+
+        reranked = sorted(candidates, key=lambda c: c["rerank_score"], reverse=True)
+        print(
+            "Gemini reranking complete. Top: "
+            + ", ".join(f"{c['source_type']}({c['rerank_score']:.1f})" for c in reranked[:top_n])
+        )
+        return reranked[:top_n]
+    except Exception as e:
+        print(f"Gemini reranking failed ({e}); falling back to initial retrieval order.")
+        return candidates[:top_n]
+
+
 async def search_all_sources_with_gemini_reranking(query: str):
 
     guides_task = asyncio.create_task(search_guides_with_knn_bm25(query, k=3))
     fandom_task = asyncio.create_task(search_fandom_with_knn_bm25(query, k=3))
     forum_task = asyncio.create_task(search_forum_with_knn_bm25(query, k=3))
-    
+
     guides_results = await guides_task
     fandom_results = await fandom_task
     forum_results = await forum_task
-    
+
     print(f"Initial retrieval: {len(guides_results)} guides, {len(fandom_results)} fandom, {len(forum_results)} forum")
-    
+
     rerank_candidates = []
     
     for i, result in enumerate(guides_results):
@@ -1934,13 +2004,15 @@ async def search_all_sources_with_gemini_reranking(query: str):
             "initial_rank": i,
         })
     
+    rerank_candidates = await gemini_rerank_candidates(query, rerank_candidates, top_n=6)
+
     sources_info = []
     for res in rerank_candidates:
         if not any(s_url == res['url'] for _, s_url in sources_info):
             sources_info.append((res['title'], res['url']))
-    
+
     context_parts = []
-    
+
     for res in rerank_candidates:
         if res['source_type'] == 'guide':
             context_parts.append(f"From Guide '{res['title']}':\n{res['content']}")
